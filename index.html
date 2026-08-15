@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saran R — Biotechnology Innovator</title>
+  <meta name="description" content="Portfolio of Saran R, a 4th year Biotechnology student passionate about research, innovation, and entrepreneurship." />
+  <meta name="keywords" content="Saran R, Biotechnology, Portfolio, Research, Internship, Entrepreneur" />
+  <meta property="og:title" content="Saran R — Biotechnology Innovator" />
+  <meta property="og:description" content="Explore the work, research, writings, and journey of Saran R." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Canvas for particle animation -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navigation -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-logo">
+      <span class="logo-text">SR</span>
+      <span class="logo-dot"></span>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+      <li><a href="#projects" class="nav-link" id="nav-projects">Projects</a></li>
+      <li><a href="#writings" class="nav-link" id="nav-writings">Writings</a></li>
+      <li><a href="#experience" class="nav-link" id="nav-experience">Experience</a></li>
+      <li><a href="#contact" class="nav-link" id="nav-contact">Contact</a></li>
+    </ul>
+    <button class="admin-trigger-btn" id="toggle-admin-panel" title="Open Admin Panel" aria-label="Open Admin Panel">
+      <span class="admin-trigger-icon">⚙️</span>
+      <span class="admin-trigger-label">Admin</span>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Dark/Light Mode Toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle Theme">
+    <span class="theme-icon-dark">🌙</span>
+    <span class="theme-icon-light" style="display:none">☀️</span>
+    <div class="theme-slider"></div>
+  </button>
+
+  <!-- ========== ADMIN LOGIN MODAL ========== -->
+  <div class="admin-login-overlay" id="admin-login-overlay" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" style="display:none">
+    <div class="admin-login-box" id="admin-login-box">
+      <!-- Header -->
+      <div class="login-header">
+        <div class="login-logo">
+          <div class="login-logo-ring"></div>
+          <span class="login-logo-icon">🔐</span>
+        </div>
+        <h2 class="login-title" id="login-modal-title">Admin Access</h2>
+        <p class="login-subtitle">Portfolio Control Center — Authorized Personnel Only</p>
+      </div>
+
+      <!-- Lockout Screen -->
+      <div class="login-lockout" id="login-lockout" style="display:none">
+        <div class="lockout-icon">🔒</div>
+        <div class="lockout-title">Access Temporarily Blocked</div>
+        <p class="lockout-desc">Too many failed attempts. Please wait before trying again.</p>
+        <div class="lockout-timer-wrap">
+          <div class="lockout-timer-ring">
+            <svg viewBox="0 0 64 64" class="lockout-svg">
+              <circle cx="32" cy="32" r="28" class="lockout-ring-bg"/>
+              <circle cx="32" cy="32" r="28" class="lockout-ring-progress" id="lockout-ring-progress"/>
+            </svg>
+            <div class="lockout-timer-text" id="lockout-countdown">5:00</div>
+          </div>
+        </div>
+        <p class="lockout-hint">You can try again in <strong id="lockout-mins">5 minutes</strong>.</p>
+      </div>
+
+      <!-- Login Form -->
+      <form class="login-form" id="login-form" autocomplete="off" novalidate>
+        <!-- Attempt Warning -->
+        <div class="login-attempt-bar" id="login-attempt-bar" style="display:none">
+          <span class="attempt-icon">⚠️</span>
+          <span id="login-attempt-text">Incorrect credentials. <strong id="attempts-left">5</strong> attempts remaining.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="login-email">Admin Email</label>
+          <div class="login-input-wrap">
+            <span class="login-input-icon">📧</span>
+            <input type="email" id="login-email" placeholder="Enter admin email" autocomplete="off" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="login-input-wrap">
+            <span class="login-input-icon">🔑</span>
+            <input type="password" id="login-password" placeholder="Enter password" autocomplete="new-password" required />
+            <button type="button" class="toggle-password-btn" id="toggle-password-btn" title="Show/Hide password" aria-label="Toggle password visibility">
+              <span id="pw-eye">👁</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-strength-dots" id="attempt-dots" aria-label="Remaining attempts indicator">
+          <span class="attempt-dot active" data-dot="1"></span>
+          <span class="attempt-dot active" data-dot="2"></span>
+          <span class="attempt-dot active" data-dot="3"></span>
+          <span class="attempt-dot active" data-dot="4"></span>
+          <span class="attempt-dot active" data-dot="5"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary login-submit-btn" id="login-submit-btn">
+          <span class="login-btn-text">🔓 Unlock Admin Panel</span>
+          <span class="login-btn-loader" style="display:none">Verifying...</span>
+        </button>
+
+        <button type="button" class="login-cancel-btn" id="login-cancel-btn">Cancel</button>
+      </form>
+
+      <!-- Success Flash -->
+      <div class="login-success" id="login-success" style="display:none">
+        <div class="login-success-icon">✅</div>
+        <div class="login-success-text">Access Granted!</div>
+        <div class="login-success-sub">Opening Admin Panel...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN PANEL SIDEBAR ========== -->
+  <div class="admin-overlay" id="admin-overlay" aria-hidden="true"></div>
+  <aside class="admin-panel" id="admin-panel" role="complementary" aria-label="Admin Panel">
+    <div class="admin-panel-header">
+      <div class="admin-panel-logo">
+        <span class="admin-logo-icon">⚙️</span>
+        <div>
+          <div class="admin-panel-title">Admin Panel</div>
+          <div class="admin-panel-sub">Portfolio Control Center</div>
+        </div>
+      </div>
+      <button class="admin-panel-close" id="admin-panel-close" aria-label="Close Admin Panel">✕</button>
+    </div>
+
+    <div class="admin-panel-body">
+
+      <!-- Status Row -->
+      <div class="admin-status-row">
+        <div class="admin-status-indicator" id="admin-status-dot"></div>
+        <span id="admin-status-text">View Mode</span>
+        <label class="admin-toggle-switch" title="Toggle Edit Mode">
+          <input type="checkbox" id="admin-edit-toggle" aria-label="Toggle Edit Mode" />
+          <span class="admin-toggle-track"><span class="admin-toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <!-- Section: Content Management -->
+      <div class="admin-section">
+        <div class="admin-section-title">📦 Content Management</div>
+        <div class="admin-action-grid">
+          <button class="admin-action-btn" id="ap-add-project">
+            <span class="aab-icon">🔬</span>
+            <span>Add Project</span>
+          </button>
+          <button class="admin-action-btn" id="ap-add-writing">
+            <span class="aab-icon">📝</span>
+            <span>Add Writing</span>
+          </button>
+          <button class="admin-action-btn" id="ap-add-internship">
+            <span class="aab-icon">🏢</span>
+            <span>Add Internship</span>
+          </button>
+          <button class="admin-action-btn" id="ap-add-work">
+            <span class="aab-icon">💼</span>
+            <span>Add Work</span>
+          </button>
+          <button class="admin-action-btn" id="ap-add-venture">
+            <span class="aab-icon">🚀</span>
+            <span>Add Venture</span>
+          </button>
+          <button class="admin-action-btn" id="ap-add-tag">
+            <span class="aab-icon">🏷️</span>
+            <span>Add Tag</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section: Profile -->
+      <div class="admin-section">
+        <div class="admin-section-title">👤 Profile</div>
+        <button class="admin-wide-btn" id="ap-change-photo">
+          <span>📸</span> Change Profile Photo
+        </button>
+      </div>
+
+      <!-- Section: Stats -->
+      <div class="admin-section">
+        <div class="admin-section-title">📊 Hero Stats</div>
+        <div class="admin-stats-form">
+          <div class="admin-stat-row">
+            <label>Projects</label>
+            <input type="text" id="ap-stat-projects" placeholder="12+" class="admin-input" />
+          </div>
+          <div class="admin-stat-row">
+            <label>Publications</label>
+            <input type="text" id="ap-stat-pubs" placeholder="5+" class="admin-input" />
+          </div>
+          <div class="admin-stat-row">
+            <label>Internships</label>
+            <input type="text" id="ap-stat-exp" placeholder="3+" class="admin-input" />
+          </div>
+        </div>
+        <button class="admin-wide-btn accent" id="ap-save-stats">💾 Update Stats</button>
+      </div>
+
+      <!-- Section: Data -->
+      <div class="admin-section">
+        <div class="admin-section-title">🗄️ Data</div>
+        <div class="admin-data-btns">
+          <button class="admin-wide-btn" id="ap-save-all">💾 Save All Changes</button>
+          <button class="admin-wide-btn danger" id="ap-reset-data">🔄 Reset to Defaults</button>
+          <button class="admin-wide-btn" id="ap-export-data">⬇️ Export Data (JSON)</button>
+        </div>
+      </div>
+
+      <!-- Section: Appearance -->
+      <div class="admin-section">
+        <div class="admin-section-title">🎨 Appearance</div>
+        <div class="admin-appearance-row">
+          <span>Theme</span>
+          <div class="admin-theme-btns">
+            <button class="admin-theme-btn active" id="ap-theme-dark" data-theme="dark">🌙 Dark</button>
+            <button class="admin-theme-btn" id="ap-theme-light" data-theme="light">☀️ Light</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Footer -->
+      <div class="admin-panel-footer">
+        <div class="admin-footer-info">Portfolio v1.0 · Saran R</div>
+        <div class="admin-footer-hint">💡 Enable Edit Mode to click & edit any text directly on the page</div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Edit Mode Banner (slim, below admin panel) -->
+  <div class="edit-banner" id="edit-banner">
+    <span>✏️ Edit Mode Active — Click any text or card to customize</span>
+    <button id="save-changes-btn">💾 Save</button>
+    <button id="exit-edit-btn">✕ Exit Edit</button>
+  </div>
+
+  <!-- ========== HERO / HOME ========== -->
+  <section id="home" class="section hero-section">
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge" id="hero-badge" data-editable="true">
+          <span class="badge-dot"></span>
+          <span contenteditable="false">Biotechnology Student · 4th Year</span>
+        </div>
+        <h1 class="hero-name">
+          <span class="name-first" id="name-first" data-editable="true" contenteditable="false">Saran</span>
+          <span class="name-last" id="name-last" data-editable="true" contenteditable="false"> R</span>
+        </h1>
+        <p class="hero-tagline" id="hero-tagline" data-editable="true" contenteditable="false">
+          Bridging biology &amp; technology to engineer solutions for tomorrow's challenges.
+        </p>
+        <div class="hero-tags" id="hero-tags-container">
+          <span class="hero-tag" data-editable="true" contenteditable="false">🔬 Research</span>
+          <span class="hero-tag" data-editable="true" contenteditable="false">🧬 Biotech</span>
+          <span class="hero-tag" data-editable="true" contenteditable="false">💡 Innovation</span>
+          <span class="hero-tag" data-editable="true" contenteditable="false">🚀 Entrepreneur</span>
+          <button class="add-tag-btn" id="add-tag-btn" title="Add new tag" style="display:none">+ Add Tag</button>
+        </div>
+        <div class="hero-ctas">
+          <a href="#contact" class="btn btn-primary" id="hero-cta-primary">Get In Touch</a>
+          <a href="#projects" class="btn btn-secondary" id="hero-cta-secondary">View Work</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="photo-wrapper" id="photo-wrapper">
+          <div class="photo-ring"></div>
+          <div class="photo-ring ring-2"></div>
+          <div class="photo-container" id="photo-container" title="Click to upload photo">
+            <img id="profile-photo" src="" alt="Saran R" style="display:none" />
+            <div class="photo-placeholder" id="photo-placeholder">
+              <div class="photo-placeholder-icon">👤</div>
+              <p>Click to upload<br/>your photo</p>
+            </div>
+            <div class="photo-overlay" id="photo-overlay">
+              <span>📸 Change Photo</span>
+            </div>
+          </div>
+          <input type="file" id="photo-upload" accept="image/*" style="display:none" aria-label="Upload profile photo" />
+          <div class="photo-stats">
+            <div class="stat-pill" data-editable="true">
+              <span class="stat-val" data-editable="true" contenteditable="false" id="stat-projects">12+</span>
+              <span class="stat-lbl">Projects</span>
+            </div>
+            <div class="stat-pill" data-editable="true">
+              <span class="stat-val" data-editable="true" contenteditable="false" id="stat-pubs">5+</span>
+              <span class="stat-lbl">Publications</span>
+            </div>
+            <div class="stat-pill" data-editable="true">
+              <span class="stat-val" data-editable="true" contenteditable="false" id="stat-exp">3+</span>
+              <span class="stat-lbl">Internships</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ========== PROJECTS ========== -->
+  <section id="projects" class="section">
+    <div class="section-header">
+      <div class="section-tag">Work</div>
+      <h2 class="section-title" id="projects-title" data-editable="true" contenteditable="false">Projects</h2>
+      <p class="section-subtitle" id="projects-subtitle" data-editable="true" contenteditable="false">Research, experiments and builds that push boundaries.</p>
+      <button class="add-card-btn" id="add-project-btn" style="display:none">+ Add Project</button>
+    </div>
+    <div class="projects-grid" id="projects-grid">
+      <!-- Project cards injected by JS -->
+    </div>
+  </section>
+
+  <!-- ========== PUBLISHED WRITINGS ========== -->
+  <section id="writings" class="section">
+    <div class="section-header">
+      <div class="section-tag">Published</div>
+      <h2 class="section-title" id="writings-title" data-editable="true" contenteditable="false">Published Writings</h2>
+      <p class="section-subtitle" id="writings-subtitle" data-editable="true" contenteditable="false">Articles, papers, and thought pieces at the intersection of science and society.</p>
+      <button class="add-card-btn" id="add-writing-btn" style="display:none">+ Add Writing</button>
+    </div>
+    <div class="writings-list" id="writings-list">
+      <!-- Writing cards injected by JS -->
+    </div>
+  </section>
+
+  <!-- ========== WORK EXPERIENCE ========== -->
+  <section id="experience" class="section">
+    <div class="section-header">
+      <div class="section-tag">Journey</div>
+      <h2 class="section-title" id="experience-title" data-editable="true" contenteditable="false">Work Experience</h2>
+      <p class="section-subtitle" id="experience-subtitle" data-editable="true" contenteditable="false">Three chapters of a story still being written.</p>
+    </div>
+    <!-- Category Tabs -->
+    <div class="exp-tabs" role="tablist" aria-label="Experience categories">
+      <button class="exp-tab active" id="tab-internship" role="tab" aria-selected="true" data-tab="internship">
+        <span class="tab-icon">🏢</span> Internship
+      </button>
+      <button class="exp-tab" id="tab-work" role="tab" aria-selected="false" data-tab="work">
+        <span class="tab-icon">💼</span> Work
+      </button>
+      <button class="exp-tab" id="tab-entrepreneurial" role="tab" aria-selected="false" data-tab="entrepreneurial">
+        <span class="tab-icon">🚀</span> Entrepreneurial Journey
+      </button>
+    </div>
+    <div class="exp-content-area">
+      <div class="exp-panel active" id="panel-internship" role="tabpanel" aria-labelledby="tab-internship">
+        <button class="add-card-btn add-exp-btn" data-tab="internship" style="display:none">+ Add Internship</button>
+        <div class="timeline" id="timeline-internship"></div>
+      </div>
+      <div class="exp-panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work">
+        <button class="add-card-btn add-exp-btn" data-tab="work" style="display:none">+ Add Work Experience</button>
+        <div class="timeline" id="timeline-work"></div>
+      </div>
+      <div class="exp-panel" id="panel-entrepreneurial" role="tabpanel" aria-labelledby="tab-entrepreneurial">
+        <button class="add-card-btn add-exp-btn" data-tab="entrepreneurial" style="display:none">+ Add Venture</button>
+        <div class="timeline" id="timeline-entrepreneurial"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CONTACT ========== -->
+  <section id="contact" class="section contact-section">
+    <div class="section-header">
+      <div class="section-tag">Connect</div>
+      <h2 class="section-title" id="contact-title" data-editable="true" contenteditable="false">Let's Collaborate</h2>
+      <p class="section-subtitle" id="contact-subtitle" data-editable="true" contenteditable="false">Have a project, opportunity, or just want to say hi? Reach out!</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info-panel">
+        <div class="contact-card" id="email-card">
+          <div class="contact-icon">📧</div>
+          <div class="contact-details">
+            <span class="contact-label">Email me at</span>
+            <a href="mailto:saranr7367@gmail.com" class="contact-value" id="contact-email" data-editable="true" contenteditable="false">saranr7367@gmail.com</a>
+          </div>
+          <button class="copy-btn" data-copy="saranr7367@gmail.com" title="Copy email">⧉</button>
+        </div>
+        <div class="contact-card" id="phone-card">
+          <div class="contact-icon">📱</div>
+          <div class="contact-details">
+            <span class="contact-label">Call or WhatsApp</span>
+            <a href="tel:+919809801019" class="contact-value" id="contact-phone" data-editable="true" contenteditable="false">+91 9809801019</a>
+          </div>
+          <button class="copy-btn" data-copy="+91 9809801019" title="Copy phone">⧉</button>
+        </div>
+        <div class="contact-social" id="social-links">
+          <a href="#" class="social-btn" id="social-linkedin" data-editable="true" contenteditable="false" title="LinkedIn">in</a>
+          <a href="#" class="social-btn" id="social-github" data-editable="true" contenteditable="false" title="GitHub">gh</a>
+          <a href="#" class="social-btn" id="social-twitter" data-editable="true" contenteditable="false" title="Twitter/X">𝕏</a>
+          <a href="#" class="social-btn" id="social-researchgate" data-editable="true" contenteditable="false" title="ResearchGate">RG</a>
+        </div>
+      </div>
+      <form class="contact-form" id="contact-form" novalidate>
+        <h3 class="form-title">Send a Message</h3>
+        <div class="form-group">
+          <label for="form-name">Name</label>
+          <input type="text" id="form-name" placeholder="Your name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="form-email">Email</label>
+          <input type="email" id="form-email" placeholder="your@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="form-subject">Subject</label>
+          <input type="text" id="form-subject" placeholder="What's this about?" />
+        </div>
+        <div class="form-group">
+          <label for="form-message">Message</label>
+          <textarea id="form-message" rows="5" placeholder="Tell me more..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit-btn" id="form-submit">
+          <span class="btn-text">Send Message 🚀</span>
+          <span class="btn-loader" style="display:none">Sending...</span>
+        </button>
+        <div class="form-success" id="form-success" style="display:none">
+          <span>✅ Message sent! I'll get back to you soon.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-logo">SR<span class="logo-dot"></span></div>
+      <p class="footer-copy" id="footer-copy" data-editable="true" contenteditable="false">
+        © 2025 Saran R · Built with passion for science &amp; innovation
+      </p>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#projects">Projects</a>
+        <a href="#writings">Writings</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== MODALS ========== -->
+  <!-- Project Modal -->
+  <div class="modal-overlay" id="project-modal" role="dialog" aria-modal="true" aria-labelledby="pm-title" style="display:none">
+    <div class="modal-box">
+      <button class="modal-close" id="pm-close" aria-label="Close">✕</button>
+      <h3 id="pm-title">Add / Edit Project</h3>
+      <div class="modal-form">
+        <input type="hidden" id="pm-index" value="-1" />
+        <div class="form-group"><label>Title</label><input id="pm-title-input" type="text" placeholder="Project title" /></div>
+        <div class="form-group"><label>Category</label><input id="pm-category" type="text" placeholder="e.g. Biotech, Research" /></div>
+        <div class="form-group"><label>Description</label><textarea id="pm-desc" rows="3" placeholder="Brief description"></textarea></div>
+        <div class="form-group"><label>Tags (comma separated)</label><input id="pm-tags" type="text" placeholder="Python, CRISPR, ML" /></div>
+        <div class="form-group"><label>Link (optional)</label><input id="pm-link" type="url" placeholder="https://..." /></div>
+        <div class="form-group"><label>Status</label>
+          <select id="pm-status">
+            <option value="Completed">Completed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Ongoing">Ongoing</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Year</label><input id="pm-year" type="text" placeholder="2024" /></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="pm-save">Save Project</button>
+          <button class="btn btn-danger" id="pm-delete" style="display:none">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Writing Modal -->
+  <div class="modal-overlay" id="writing-modal" role="dialog" aria-modal="true" aria-labelledby="wm-title" style="display:none">
+    <div class="modal-box">
+      <button class="modal-close" id="wm-close" aria-label="Close">✕</button>
+      <h3 id="wm-title">Add / Edit Writing</h3>
+      <div class="modal-form">
+        <input type="hidden" id="wm-index" value="-1" />
+        <div class="form-group"><label>Title</label><input id="wm-title-input" type="text" placeholder="Article title" /></div>
+        <div class="form-group"><label>Publication / Journal</label><input id="wm-publication" type="text" placeholder="e.g. Nature, Medium" /></div>
+        <div class="form-group"><label>Date</label><input id="wm-date" type="text" placeholder="Jan 2024" /></div>
+        <div class="form-group"><label>Abstract / Summary</label><textarea id="wm-abstract" rows="3" placeholder="Brief summary"></textarea></div>
+        <div class="form-group"><label>Tags (comma separated)</label><input id="wm-tags" type="text" placeholder="CRISPR, Gene Editing" /></div>
+        <div class="form-group"><label>Link (optional)</label><input id="wm-link" type="url" placeholder="https://doi.org/..." /></div>
+        <div class="form-group"><label>Type</label>
+          <select id="wm-type">
+            <option value="Research Paper">Research Paper</option>
+            <option value="Review Article">Review Article</option>
+            <option value="Blog Post">Blog Post</option>
+            <option value="Conference Paper">Conference Paper</option>
+            <option value="Opinion Piece">Opinion Piece</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="wm-save">Save Writing</button>
+          <button class="btn btn-danger" id="wm-delete" style="display:none">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Modal -->
+  <div class="modal-overlay" id="exp-modal" role="dialog" aria-modal="true" aria-labelledby="em-title" style="display:none">
+    <div class="modal-box">
+      <button class="modal-close" id="em-close" aria-label="Close">✕</button>
+      <h3 id="em-title">Add / Edit Experience</h3>
+      <div class="modal-form">
+        <input type="hidden" id="em-index" value="-1" />
+        <input type="hidden" id="em-tab" value="internship" />
+        <div class="form-group"><label>Role / Position</label><input id="em-role" type="text" placeholder="e.g. Research Intern" /></div>
+        <div class="form-group"><label>Organization</label><input id="em-org" type="text" placeholder="Company / Institution name" /></div>
+        <div class="form-group"><label>Duration</label><input id="em-duration" type="text" placeholder="Jun 2023 – Aug 2023" /></div>
+        <div class="form-group"><label>Location</label><input id="em-location" type="text" placeholder="City, Country" /></div>
+        <div class="form-group"><label>Description</label><textarea id="em-desc" rows="3" placeholder="Key responsibilities and achievements"></textarea></div>
+        <div class="form-group"><label>Skills (comma separated)</label><input id="em-skills" type="text" placeholder="PCR, Cell Culture, Python" /></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="em-save">Save Experience</button>
+          <button class="btn btn-danger" id="em-delete" style="display:none">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
