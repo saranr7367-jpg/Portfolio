@@ -895,15 +895,15 @@ body {
 
 .hero-name {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-end;
-  gap: 0.08em;
+  gap: 0.04em;
   font-size: var(--hero-name-font-size);
   font-weight: 900;
   line-height: 0.96;
   letter-spacing: -2px;
   margin-bottom: 20px;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .name-first {
