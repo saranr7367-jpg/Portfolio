@@ -161,18 +161,18 @@ body {
   padding: 0 20px 0 22px;
   z-index: 1000;
   transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.16);
   border-radius: 999px;
-  background: rgba(12, 12, 12, 0.18);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 #navbar.scrolled {
-  background: rgba(13, 13, 13, 0.42);
-  border-color: rgba(255,255,255,0.18);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 16px 38px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .nav-logo {
@@ -217,8 +217,9 @@ body {
   font-weight: 500;
   padding: 8px 16px;
   border-radius: var(--radius-full);
-  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease;
   position: relative;
+  backdrop-filter: blur(8px);
 }
 
 .nav-link:hover,
@@ -231,7 +232,8 @@ body {
 
 .nav-link.active {
   color: var(--accent-primary);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
 }
 
 /* ---------- Admin Trigger Button (in nav) ---------- */
@@ -241,7 +243,7 @@ body {
   gap: 7px;
   padding: 8px 18px;
   border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
   border-radius: var(--radius-full);
   cursor: pointer;
@@ -251,6 +253,7 @@ body {
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   letter-spacing: 0.3px;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .admin-trigger-btn:hover,
@@ -258,7 +261,7 @@ body {
 .admin-trigger-btn:focus-visible {
   border-color: rgba(255,255,255,0.2);
   color: var(--accent-primary);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.09);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   transform: translateY(-1px);
 }

@@ -24,6 +24,27 @@ const ATTEMPTS_KEY    = 'admin_attempts';
 const SESSION_KEY     = 'admin_authenticated';
 const CIRCUMFERENCE   = 2 * Math.PI * 28; // SVG ring circumference
 
+const DEFAULT_AD_SLIDES = [
+  {
+    kicker: 'Innovation',
+    title: 'Future-ready biotech',
+    subtitle: 'Translating research into scalable, human-centered solutions.',
+    image: 'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=1600&q=80'
+  },
+  {
+    kicker: 'Research',
+    title: 'Precision at scale',
+    subtitle: 'From experiments to product strategy, built for impact.',
+    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1600&q=80'
+  },
+  {
+    kicker: 'Impact',
+    title: 'Smarter systems',
+    subtitle: 'Designing tools and ideas that move science forward.',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80'
+  }
+];
+
 /* ============================================================
    ADMIN LOGIN CONTROLLER
    ============================================================ */
@@ -1103,16 +1124,73 @@ function splitTextIntoChars(selector) {
   });
 }
 
-function initAdCarousel() {
-  const slides = document.querySelectorAll('.ad-slide');
-  if (!slides.length) return;
+function getAdSlides() {
+  try {
+    const saved = localStorage.getItem('portfolio_ad_slides');
+    if (!saved) return JSON.parse(JSON.stringify(DEFAULT_AD_SLIDES));
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) && parsed.length ? parsed : JSON.parse(JSON.stringify(DEFAULT_AD_SLIDES));
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_AD_SLIDES));
+  }
+}
+
+function renderAdCarousel() {
+  const carousel = document.getElementById('ad-carousel');
+  if (!carousel) return;
+
+  const slides = getAdSlides();
+  carousel.innerHTML = slides.map((slide, index) => `
+    <div class="ad-slide ${index === 0 ? 'active' : ''}">
+      <img src="${slide.image || 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80'}" alt="${slide.title || 'Brand slide'}" />
+      <div class="ad-caption">
+        <span class="ad-kicker">${slide.kicker || 'Featured'}</span>
+        <h3 class="ad-title">${slide.title || 'Your message'}</h3>
+        <p class="ad-subtitle">${slide.subtitle || 'A short impact line for your campaign.'}</p>
+      </div>
+    </div>
+  `).join('');
+
+  const allSlides = document.querySelectorAll('.ad-slide');
+  if (!allSlides.length) return;
 
   let current = 0;
-  setInterval(() => {
-    slides[current].classList.remove('active');
-    current = (current + 1) % slides.length;
-    slides[current].classList.add('active');
-  }, 3200);
+  const cycle = () => {
+    allSlides[current].classList.remove('active');
+    current = (current + 1) % allSlides.length;
+    allSlides[current].classList.add('active');
+  };
+
+  clearInterval(window.adCarouselTimer);
+  window.adCarouselTimer = setInterval(cycle, 3200);
+}
+
+function populateAdCarouselForm() {
+  const slides = getAdSlides();
+  for (let i = 0; i < 3; i++) {
+    const slide = slides[i] || {};
+    document.getElementById(`ad-kicker-${i + 1}`).value = slide.kicker || '';
+    document.getElementById(`ad-title-${i + 1}`).value = slide.title || '';
+    document.getElementById(`ad-subtitle-${i + 1}`).value = slide.subtitle || '';
+    document.getElementById(`ad-image-${i + 1}`).value = slide.image || '';
+  }
+}
+
+function saveAdSlidesFromForm() {
+  const slides = Array.from({ length: 3 }, (_, i) => ({
+    kicker: document.getElementById(`ad-kicker-${i + 1}`).value.trim() || 'Featured',
+    title: document.getElementById(`ad-title-${i + 1}`).value.trim() || `Slide ${i + 1}`,
+    subtitle: document.getElementById(`ad-subtitle-${i + 1}`).value.trim() || 'Brand message',
+    image: document.getElementById(`ad-image-${i + 1}`).value.trim() || DEFAULT_AD_SLIDES[i].image
+  }));
+
+  localStorage.setItem('portfolio_ad_slides', JSON.stringify(slides));
+  renderAdCarousel();
+  showToast('Ad carousel updated! 🎬', 'success');
+}
+
+function initAdCarousel() {
+  renderAdCarousel();
 }
 
 function init() {
@@ -1173,6 +1251,7 @@ function initAdminPanel() {
     if (sp) document.getElementById('ap-stat-projects').value = sp.textContent;
     if (spb) document.getElementById('ap-stat-pubs').value = spb.textContent;
     if (se) document.getElementById('ap-stat-exp').value = se.textContent;
+    populateAdCarouselForm();
   }
 
   function closePanel() {
@@ -1265,6 +1344,11 @@ function initAdminPanel() {
     if (spbEl && v2) { spbEl.textContent = v2; localStorage.setItem('portfolio_text_stat-pubs', v2); }
     if (seEl && v3) { seEl.textContent = v3; localStorage.setItem('portfolio_text_stat-exp', v3); }
     showToast('Stats updated! 📊', 'success');
+  });
+
+  // Save carousel
+  document.getElementById('ap-save-carousel').addEventListener('click', () => {
+    saveAdSlidesFromForm();
   });
 
   // Save all
