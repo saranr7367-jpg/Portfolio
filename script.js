@@ -1085,36 +1085,68 @@ function initSectionReveals() {
 /* ============================================================
    INITIALIZATION
    ============================================================ */
+function splitTextIntoChars(selector) {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach((element) => {
+    if (element.dataset.split === 'done') return;
+    const text = element.textContent;
+    element.textContent = '';
+    [...text].forEach((char, index) => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.style.setProperty('--char-index', index);
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      element.appendChild(span);
+    });
+    element.classList.add('split-text');
+    element.dataset.split = 'done';
+  });
+}
+
+function initAdCarousel() {
+  const slides = document.querySelectorAll('.ad-slide');
+  if (!slides.length) return;
+
+  let current = 0;
+  setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }, 3200);
+}
+
 function init() {
   renderProjects();
   renderWritings();
   renderExperience();
   loadInlineTexts();
   initSectionReveals();
+  splitTextIntoChars('.hero-name, .hero-tagline, .hero-badge');
   setTimeout(observeReveal, 200);
 
-  // Animate hero elements on load
-  const heroEls = document.querySelectorAll('.hero-badge, .hero-name, .hero-tagline, .hero-tags, .hero-ctas');
+  const heroEls = document.querySelectorAll('.hero-badge, .hero-name, .hero-tagline, .hero-tags');
   heroEls.forEach((el, i) => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
+    el.style.transform = 'translateY(28px)';
     setTimeout(() => {
       el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
       el.style.opacity = '1';
       el.style.transform = 'translateY(0)';
-    }, 200 + i * 120);
+    }, 150 + i * 110);
   });
 
   const photoWrapper = document.querySelector('.photo-wrapper');
   if (photoWrapper) {
     photoWrapper.style.opacity = '0';
-    photoWrapper.style.transform = 'scale(0.92)';
+    photoWrapper.style.transform = 'scale(0.96)';
     setTimeout(() => {
       photoWrapper.style.transition = 'opacity 0.9s ease, transform 0.9s ease';
       photoWrapper.style.opacity = '1';
       photoWrapper.style.transform = 'scale(1)';
-    }, 400);
+    }, 350);
   }
+
+  initAdCarousel();
 }
 
 
@@ -1132,6 +1164,7 @@ function initAdminPanel() {
     panel.classList.add('open');
     overlay.classList.add('visible');
     triggerBtn.classList.add('panel-open');
+    document.body.classList.add('admin-panel-open');
     document.body.style.overflow = 'hidden';
     // Populate stat inputs with current values
     const sp = document.getElementById('stat-projects');
@@ -1146,6 +1179,7 @@ function initAdminPanel() {
     panel.classList.remove('open');
     overlay.classList.remove('visible');
     triggerBtn.classList.remove('panel-open');
+    document.body.classList.remove('admin-panel-open');
     document.body.style.overflow = '';
   }
 
