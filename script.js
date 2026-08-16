@@ -1180,17 +1180,30 @@ function populateAdCarouselForm() {
     document.getElementById(`ad-kicker-${i + 1}`).value = slide.kicker || '';
     document.getElementById(`ad-title-${i + 1}`).value = slide.title || '';
     document.getElementById(`ad-subtitle-${i + 1}`).value = slide.subtitle || '';
-    document.getElementById(`ad-image-${i + 1}`).value = slide.image || '';
+    const fileInput = document.getElementById(`ad-image-${i + 1}`);
+    fileInput.dataset.savedUrl = slide.image || '';
+    fileInput.value = '';
   }
 }
 
 function saveAdSlidesFromForm() {
-  const slides = Array.from({ length: 3 }, (_, i) => ({
-    kicker: document.getElementById(`ad-kicker-${i + 1}`).value.trim() || 'Featured',
-    title: document.getElementById(`ad-title-${i + 1}`).value.trim() || `Slide ${i + 1}`,
-    subtitle: document.getElementById(`ad-subtitle-${i + 1}`).value.trim() || 'Brand message',
-    image: document.getElementById(`ad-image-${i + 1}`).value.trim() || DEFAULT_AD_SLIDES[i].image
-  }));
+  const slides = [];
+
+  Array.from({ length: 3 }).forEach((_, i) => {
+    const fileInput = document.getElementById(`ad-image-${i + 1}`);
+    const file = fileInput && fileInput.files && fileInput.files[0];
+
+    const image = file
+      ? URL.createObjectURL(file)
+      : (document.getElementById(`ad-image-${i + 1}`).dataset.savedUrl || DEFAULT_AD_SLIDES[i].image);
+
+    slides.push({
+      kicker: document.getElementById(`ad-kicker-${i + 1}`).value.trim() || 'Featured',
+      title: document.getElementById(`ad-title-${i + 1}`).value.trim() || `Slide ${i + 1}`,
+      subtitle: document.getElementById(`ad-subtitle-${i + 1}`).value.trim() || 'Brand message',
+      image
+    });
+  });
 
   localStorage.setItem('portfolio_ad_slides', JSON.stringify(slides));
   renderAdCarousel();
