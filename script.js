@@ -257,109 +257,62 @@ function initAdminLogin() {
 window.openAdminPanel = function () {};
 
 /* ============================================================
-   FOOD-TECH CANVAS ANIMATION
+   MINIMAL FUTURISTIC BACKDROP ANIMATION
    ============================================================ */
 (function initCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  let W = 0, H = 0, particles = [];
-  const palette = [
-    '123,207,126',
-    '168,217,127',
-    '111,160,112',
-    '147,215,141',
-    '80,149,98'
-  ];
+  let W = 0, H = 0;
+  const glows = [];
 
   function resize() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
-  }
-
-  class FoodParticle {
-    constructor() {
-      this.reset();
-    }
-
-    reset() {
-      this.x = Math.random() * W;
-      this.y = Math.random() * H;
-      this.vx = (Math.random() - 0.5) * 0.6;
-      this.vy = (Math.random() - 0.5) * 0.5;
-      this.r = Math.random() * 24 + 18;
-      this.alpha = Math.random() * 0.26 + 0.08;
-      this.rotation = Math.random() * Math.PI * 2;
-      this.spin = (Math.random() - 0.5) * 0.01;
-      this.tone = palette[Math.floor(Math.random() * palette.length)];
-      this.drift = Math.random() * 80 + 30;
-    }
-
-    update() {
-      this.x += this.vx + Math.sin((this.y + this.drift) / 60) * 0.12;
-      this.y += this.vy + Math.cos((this.x + this.drift) / 80) * 0.12;
-
-      if (this.x < -40) this.x = W + 40;
-      if (this.x > W + 40) this.x = -40;
-      if (this.y < -40) this.y = H + 40;
-      if (this.y > H + 40) this.y = -40;
-
-      this.rotation += this.spin;
-    }
-
-    draw() {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.rotation);
-
-      ctx.beginPath();
-      ctx.ellipse(0, 0, this.r * 0.9, this.r * 0.45, 0, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${this.tone}, ${this.alpha})`;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(this.r * 0.18, -this.r * 0.08, this.r * 0.16, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      ctx.fill();
-
-      ctx.restore();
+    glows.length = 0;
+    for (let i = 0; i < 6; i++) {
+      glows.push({
+        x: (i + 1) * (W / 7),
+        y: H * (0.25 + (i % 3) * 0.2),
+        r: W * (0.12 + i * 0.025),
+        alpha: 0.08 + i * 0.012,
+        drift: (Math.random() - 0.5) * 26,
+      });
     }
   }
 
-  function initParticles() {
-    particles = Array.from({ length: 32 }, () => new FoodParticle());
-  }
+  function drawAtmosphere() {
+    ctx.clearRect(0, 0, W, H);
 
-  function drawBackdropGlow() {
-    const glows = [
-      { x: W * 0.22, y: H * 0.28, r: W * 0.26, c: '123,207,126' },
-      { x: W * 0.75, y: H * 0.62, r: W * 0.3, c: '111,160,112' },
-      { x: W * 0.46, y: H * 0.8, r: W * 0.2, c: '168,217,127' }
-    ];
-
-    glows.forEach(glow => {
-      const radial = ctx.createRadialGradient(glow.x, glow.y, 0, glow.x, glow.y, glow.r);
-      radial.addColorStop(0, `rgba(${glow.c}, 0.18)`);
-      radial.addColorStop(0.45, `rgba(${glow.c}, 0.08)`);
+    glows.forEach((glow, index) => {
+      const x = glow.x + Math.sin((performance.now() * 0.00035) + index) * glow.drift;
+      const y = glow.y + Math.cos((performance.now() * 0.00028) + index) * 18;
+      const radial = ctx.createRadialGradient(x, y, 0, x, y, glow.r);
+      radial.addColorStop(0, `rgba(123, 207, 126, ${glow.alpha})`);
+      radial.addColorStop(0.45, `rgba(168, 217, 127, ${glow.alpha * 0.6})`);
       radial.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = radial;
       ctx.fillRect(0, 0, W, H);
     });
+
+    ctx.strokeStyle = 'rgba(168, 217, 127, 0.08)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+      const y = H * (0.15 + i * 0.18) + Math.sin(performance.now() * 0.0005 + i) * 18;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y + Math.sin(i) * 8);
+      ctx.stroke();
+    }
   }
 
   function animate() {
-    ctx.clearRect(0, 0, W, H);
-    drawBackdropGlow();
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
+    drawAtmosphere();
     requestAnimationFrame(animate);
   }
 
   resize();
-  initParticles();
   animate();
   window.addEventListener('resize', resize);
 })();
@@ -459,7 +412,10 @@ const photoUpload = document.getElementById('photo-upload');
 const profilePhoto = document.getElementById('profile-photo');
 const photoPlaceholder = document.getElementById('photo-placeholder');
 
-photoContainer.addEventListener('click', () => photoUpload.click());
+if (photoContainer) {
+  photoContainer.style.cursor = 'default';
+  photoContainer.setAttribute('title', 'Profile photo');
+}
 
 photoUpload.addEventListener('change', (e) => {
   const file = e.target.files[0];
