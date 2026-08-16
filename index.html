@@ -21,8 +21,14 @@
   <!-- Navigation -->
   <nav id="navbar" role="navigation" aria-label="Main navigation">
     <div class="nav-logo">
-      <span class="logo-text">SR</span>
-      <span class="logo-dot"></span>
+      <div class="brand-mark">
+        <span class="logo-text">SR</span>
+        <span class="logo-dot"></span>
+      </div>
+      <div class="hero-badge nav-brand-meta" id="hero-badge" data-editable="true">
+        <span class="badge-dot"></span>
+        <span contenteditable="false">Biotechnology Student · 4th Year</span>
+      </div>
     </div>
     <ul class="nav-links" id="nav-links">
       <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
@@ -256,11 +262,18 @@
       <!-- Section: Appearance -->
       <div class="admin-section">
         <div class="admin-section-title">🎨 Appearance</div>
-        <div class="admin-appearance-row">
+        <div class="admin-appearance-row admin-appearance-column">
           <span>Theme</span>
           <div class="admin-theme-btns">
             <button class="admin-theme-btn active" id="ap-theme-dark" data-theme="dark">🌙 Dark</button>
             <button class="admin-theme-btn" id="ap-theme-light" data-theme="light">☀️ Light</button>
+          </div>
+        </div>
+        <div class="admin-appearance-row admin-appearance-column">
+          <span>Hero name size</span>
+          <div class="admin-size-control">
+            <input id="hero-name-size-control" type="range" min="48" max="120" step="2" value="72" />
+            <span id="hero-name-size-value">72px</span>
           </div>
         </div>
       </div>
@@ -285,10 +298,6 @@
   <section id="home" class="section hero-section">
     <div class="hero-content">
       <div class="hero-left">
-        <div class="hero-badge" id="hero-badge" data-editable="true">
-          <span class="badge-dot"></span>
-          <span contenteditable="false">Biotechnology Student · 4th Year</span>
-        </div>
         <h1 class="hero-name">
           <span class="name-first" id="name-first" data-editable="true" contenteditable="false">Saran</span>
           <span class="name-last" id="name-last" data-editable="true" contenteditable="false"> R</span>

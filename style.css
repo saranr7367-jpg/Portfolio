@@ -5,6 +5,7 @@
 
 /* ---------- CSS Variables / Design Tokens ---------- */
 :root {
+  --hero-name-font-size: 72px;
   --bg-primary: #050505;
   --bg-secondary: #121212;
   --bg-card: rgba(20, 20, 20, 0.7);
@@ -178,8 +179,14 @@ body {
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   cursor: pointer;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .logo-text {
@@ -197,6 +204,26 @@ body {
   background: var(--accent-green);
   border-radius: var(--radius-full);
   animation: pulse-dot 2s infinite;
+}
+
+.nav-brand-meta {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: none;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.nav-brand-meta .badge-dot {
+  width: 7px;
+  height: 7px;
+  min-width: 7px;
 }
 
 @keyframes pulse-dot {
@@ -624,6 +651,32 @@ body {
   font-weight: 600;
 }
 
+.admin-appearance-column {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-size-control {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-size-control input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent-primary);
+}
+
+.admin-size-control span {
+  min-width: 52px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-primary);
+}
+
 .admin-theme-btns { display: flex; gap: 6px; }
 
 .admin-theme-btn {
@@ -817,6 +870,22 @@ body {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
+.nav-brand-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .badge-dot {
   width: 7px; height: 7px;
   background: var(--accent-green);
@@ -829,7 +898,7 @@ body {
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 0.08em;
-  font-size: clamp(2.75rem, 6vw, 5rem);
+  font-size: var(--hero-name-font-size);
   font-weight: 900;
   line-height: 0.96;
   letter-spacing: -2px;

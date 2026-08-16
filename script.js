@@ -739,6 +739,14 @@ function saveHeroTags() {
   localStorage.setItem('portfolio_hero_tags', JSON.stringify(tags));
 }
 
+function applyHeroNameSize(value) {
+  const size = Number(value) || 72;
+  document.documentElement.style.setProperty('--hero-name-font-size', `${size}px`);
+  localStorage.setItem('portfolio_hero_name_size', String(size));
+  const label = document.getElementById('hero-name-size-value');
+  if (label) label.textContent = `${size}px`;
+}
+
 // Collect all inline edits when either Save button is pressed.
 function collectInlineEdits() {
   document.querySelectorAll('[data-editable="true"]').forEach(saveInlineText);
@@ -1391,6 +1399,16 @@ function initAdminPanel() {
     document.getElementById('ap-theme-light').classList.add('active');
     document.getElementById('ap-theme-dark').classList.remove('active');
   });
+
+  const nameFontInput = document.getElementById('hero-name-size-control');
+  if (nameFontInput) {
+    const savedSize = Number(localStorage.getItem('portfolio_hero_name_size') || 72);
+    nameFontInput.value = String(savedSize);
+    applyHeroNameSize(savedSize);
+    nameFontInput.addEventListener('input', (event) => {
+      applyHeroNameSize(event.target.value);
+    });
+  }
 }
 
 
